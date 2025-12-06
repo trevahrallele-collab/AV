@@ -22,8 +22,8 @@ CURRENCY_PAIRS = [
     ("USD", "CAD")
 ]
 
-# Stock symbols to fetch
-STOCK_SYMBOLS = ["AAPL"]
+# Stock symbols to fetch - Big Five US Tech Stocks
+STOCK_SYMBOLS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
 
 # API Rate limiting (requests per minute = 5, so wait 12 seconds between requests)
 API_RATE_LIMIT_SECONDS = 12

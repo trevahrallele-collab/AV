@@ -549,32 +549,53 @@ def build_summary_async(cache_path: str = CACHE_FILE) -> dict:
 
 @APP.route("/")
 def index():
-    # If cached summary exists, load it; otherwise run backtests and cache
-    if os.path.exists(CACHE_FILE):
-        df = pd.read_csv(CACHE_FILE)
-    else:
-        # kick off an async build and show a placeholder
-        build_summary_async(CACHE_FILE)
-        df = pd.DataFrame([{"Pair": "(building)", "Return [%]": None}])
 
-    # Add chart links where available
-    def chart_link(pair_text: str):
+    # Load Forex and Stock summaries
+    forex_df = None
+    stock_df = None
+    if os.path.exists(CACHE_FILE):
+        forex_df = pd.read_csv(CACHE_FILE)
+    else:
+        build_summary_async(CACHE_FILE)
+        forex_df = pd.DataFrame([{"Pair": "(building)", "Return [%]": None}])
+
+    if os.path.exists("stock_backtest_summary.csv"):
+        stock_df = pd.read_csv("stock_backtest_summary.csv")
+    else:
+        stock_df = pd.DataFrame([{"Symbol": "(building)", "Return [%]": None}])
+
+    # Helper for details link
+    def chart_link_fx(pair_text: str):
         try:
             sym = pair_text.replace("/", "_") + "_daily"
             return f'<a href="/pair/{sym}">View Details →</a>'
         except Exception:
             return "(no data)"
 
-    df_display = df.copy()
-    df_display["Details"] = df_display["Pair"].apply(chart_link)
-    if "Chart" in df_display.columns:
-        df_display = df_display.drop("Chart", axis=1)
+    def chart_link_stock(symbol: str):
+        try:
+            sym = symbol + "_daily"
+            return f'<a href="/pair/{sym}">View Details →</a>'
+        except Exception:
+            return "(no data)"
 
-    # Format numeric columns
-    for col in df_display.columns:
+    fx_display = forex_df.copy()
+    fx_display["Details"] = fx_display["Pair"].apply(chart_link_fx)
+    if "Chart" in fx_display.columns:
+        fx_display = fx_display.drop("Chart", axis=1)
+    for col in fx_display.columns:
         if col not in ["Pair", "Details"]:
             try:
-                df_display[col] = df_display[col].apply(lambda x: f"{x:.2f}" if x is not None else "N/A")
+                fx_display[col] = fx_display[col].apply(lambda x: f"{x:.2f}" if x is not None else "N/A")
+            except:
+                pass
+
+    stock_display = stock_df.copy()
+    stock_display["Details"] = stock_display["Symbol"].apply(chart_link_stock)
+    for col in stock_display.columns:
+        if col not in ["Symbol", "Details"]:
+            try:
+                stock_display[col] = stock_display[col].apply(lambda x: f"{x:.2f}" if x is not None else "N/A")
             except:
                 pass
 
@@ -591,27 +612,64 @@ def index():
     <div class="container">
         <header>
             <h1>📊 Ichimoku Backtest Dashboard</h1>
-            <p style="color: #999; margin-top: 10px;">Real-time FX trading strategy analysis and equity curve visualization</p>
+            <p style="color: #999; margin-top: 10px;">Real-time FX & Stock trading strategy analysis and equity curve visualization</p>
         </header>
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('forex')">Forex Results</button>
+            <button class="tab-btn" onclick="showTab('stock')">Stock Results</button>
+        </div>
+        <div id="tab-forex" class="tab-content active">
+            <h3>📈 Forex Backtest Results</h3>
+            {forex_table}
+            <h3>💹 Forex Equity Curves</h3>
+            {forex_equity}
+        </div>
+        <div id="tab-stock" class="tab-content">
+            <h3>📈 Stock Backtest Results</h3>
+            {stock_table}
+            <h3>💹 Stock Equity Curves</h3>
+            {stock_equity}
+        </div>
+        <hr>
+        <div class="button-group">
+            <a href="/rebuild_async" class="btn">🔄 Rebuild Summary (Async)</a>
+            <a href="/build_status" class="btn secondary">📊 Build Status</a>
+        </div>
+        <footer>Ichimoku Backtest Dashboard • Powered by Python, Flask & Plotly</footer>
+    </div>
+    <script>
+    function showTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tabEl => tabEl.classList.remove('active'));
+        document.querySelector('.tab-btn[onclick*="' + tab + '"]').classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    }
+    </script>
+    <style>
+    .tab-nav { display: flex; gap: 20px; margin-bottom: 30px; }
+    .tab-btn { padding: 12px 32px; font-size: 1.1em; border: none; border-radius: 8px 8px 0 0; background: #f0f0f0; color: #667eea; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    </style>
     """
-    
-    html += status_html
-    
-    html += "<h3>📈 Backtest Results</h3>"
-    html += df_display.to_html(escape=False, index=False, classes="results-table")
-    
-    html += "<h3>💹 Equity Curves</h3>"
-    equity_files = []
+
+    # Render tables and equity curves
+    forex_table = fx_display.to_html(escape=False, index=False, classes="results-table")
+    stock_table = stock_display.to_html(escape=False, index=False, classes="results-table")
+
+    # Forex equity curves
+    forex_equity_files = []
     for pair in ["EUR_USD_daily", "GBP_USD_daily", "USD_JPY_daily", "AUD_USD_daily", "USD_CAD_daily"]:
         eq_file = f"{pair}_equity{CHART_EXT}"
         if os.path.exists(eq_file):
             pair_display = pair.replace("_daily", "").replace("_", "/")
-            equity_files.append((pair_display, eq_file, pair))
-    
-    if equity_files:
-        html += "<div class='equity-grid'>"
-        for pair_display, eq_file, pair_full in equity_files:
-            html += f"""
+            forex_equity_files.append((pair_display, eq_file, pair))
+    forex_equity = ""
+    if forex_equity_files:
+        forex_equity += "<div class='equity-grid'>"
+        for pair_display, eq_file, pair_full in forex_equity_files:
+            forex_equity += f"""
             <div class='equity-card'>
                 <h4>💰 {pair_display}</h4>
                 <iframe src="/chart/{eq_file}"></iframe>
@@ -620,19 +678,39 @@ def index():
                 </div>
             </div>
             """
-        html += "</div>"
+        forex_equity += "</div>"
     else:
-        html += "<p>⏳ No equity curves available yet.</p>"
-    
-    html += """
-    <hr>
-    <div class="button-group">
-        <a href="/rebuild_async" class="btn">🔄 Rebuild Summary (Async)</a>
-        <a href="/build_status" class="btn secondary">📊 Build Status</a>
-    </div>
-    <footer>Ichimoku Backtest Dashboard • Powered by Python, Flask & Plotly</footer>
-    </div>
-    """
+        forex_equity += "<p>⏳ No equity curves available yet.</p>"
+
+    # Stock equity curves (if any)
+    stock_equity_files = []
+    for symbol in stock_df["Symbol"].dropna().unique():
+        eq_file = f"{symbol}_daily_equity{CHART_EXT}"
+        if os.path.exists(eq_file):
+            stock_equity_files.append((symbol, eq_file, f"{symbol}_daily"))
+    stock_equity = ""
+    if stock_equity_files:
+        stock_equity += "<div class='equity-grid'>"
+        for symbol, eq_file, pair_full in stock_equity_files:
+            stock_equity += f"""
+            <div class='equity-card'>
+                <h4>💰 {symbol}</h4>
+                <iframe src="/chart/{eq_file}"></iframe>
+                <div class='card-footer'>
+                    <a href="/pair/{pair_full}">View Full Analysis →</a>
+                </div>
+            </div>
+            """
+        stock_equity += "</div>"
+    else:
+        stock_equity += "<p>⏳ No equity curves available yet.</p>"
+
+    # Fill template
+    # Insert tables and equity sections using f-string to avoid KeyError from CSS curly braces
+    html = html.replace("{forex_table}", forex_table)
+    html = html.replace("{forex_equity}", forex_equity)
+    html = html.replace("{stock_table}", stock_table)
+    html = html.replace("{stock_equity}", stock_equity)
     return html
 
 

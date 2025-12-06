@@ -1,0 +1,277 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Ichimoku Backtest Analysis - Stocks vs Forex</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            h1, h2 {
+                color: #2c3e50;
+                border-bottom: 3px solid #3498db;
+                padding-bottom: 10px;
+            }
+            .section {
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+            }
+            th {
+                background-color: #3498db;
+                color: white;
+                padding: 12px;
+                text-align: left;
+            }
+            td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+            tr:hover {
+                background-color: #f9f9f9;
+            }
+            .positive {
+                color: #27ae60;
+                font-weight: bold;
+            }
+            .negative {
+                color: #e74c3c;
+                font-weight: bold;
+            }
+            .chart {
+                text-align: center;
+                margin: 20px 0;
+            }
+            .chart img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+            }
+            .summary-box {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 15px;
+                margin: 20px 0;
+            }
+            .metric {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+            }
+            .metric.positive {
+                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            }
+            .metric.negative {
+                background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            }
+            .metric-label {
+                font-size: 12px;
+                opacity: 0.9;
+                margin-bottom: 5px;
+            }
+            .metric-value {
+                font-size: 24px;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>🚀 Ichimoku Backtest Analysis: Stocks vs Forex</h1>
+        
+        <div class="section">
+            <h2>📊 Overview</h2>
+            <p>This report compares the performance of the Ichimoku Cloud strategy on:</p>
+            <ul>
+                <li><strong>5 Big Five Tech Stocks:</strong> AAPL, MSFT, GOOGL, AMZN, NVDA</li>
+                <li><strong>5 Forex Pairs:</strong> EUR/USD, GBP/USD, AUD/USD, USD/JPY, USD/CAD</li>
+                <li><strong>Period:</strong> 5 years of daily data (2020-2025)</li>
+                <li><strong>Strategy:</strong> Ichimoku Cloud + EMA Trend Filter</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>📈 Stock Backtest Results</h2>
+            <table>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Strategy Return</th>
+                    <th>Buy & Hold</th>
+                    <th>Max Drawdown</th>
+                    <th>Win Rate</th>
+                    <th>Profit Factor</th>
+                    <th># Trades</th>
+                </tr>
+    
+                <tr>
+                    <td><strong>AAPL</strong></td>
+                    <td class="negative">-65.74%</td>
+                    <td>126.95%</td>
+                    <td class="negative">-99.28%</td>
+                    <td>55.00%</td>
+                    <td>1.60</td>
+                    <td>20</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>MSFT</strong></td>
+                    <td class="negative">-66.08%</td>
+                    <td>114.22%</td>
+                    <td class="negative">-92.80%</td>
+                    <td>43.75%</td>
+                    <td>1.26</td>
+                    <td>16</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>GOOGL</strong></td>
+                    <td class="negative">-66.43%</td>
+                    <td>214.94%</td>
+                    <td class="negative">-91.06%</td>
+                    <td>50.00%</td>
+                    <td>1.64</td>
+                    <td>16</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>AMZN</strong></td>
+                    <td class="negative">-100.00%</td>
+                    <td>44.32%</td>
+                    <td class="negative">-100.00%</td>
+                    <td>35.71%</td>
+                    <td>0.76</td>
+                    <td>14</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>NVDA</strong></td>
+                    <td class="negative">-100.00%</td>
+                    <td>1174.21%</td>
+                    <td class="negative">-100.00%</td>
+                    <td>30.00%</td>
+                    <td>0.62</td>
+                    <td>10</td>
+                </tr>
+        
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>💱 Forex Backtest Results</h2>
+            <table>
+                <tr>
+                    <th>Pair</th>
+                    <th>Strategy Return</th>
+                    <th>Buy & Hold</th>
+                    <th>Max Drawdown</th>
+                    <th>Win Rate</th>
+                    <th>Profit Factor</th>
+                    <th># Trades</th>
+                </tr>
+    
+                <tr>
+                    <td><strong>EUR_USD</strong></td>
+                    <td class="negative">-75.43%</td>
+                    <td>12.34%</td>
+                    <td class="negative">-87.67%</td>
+                    <td>35.06%</td>
+                    <td>0.82</td>
+                    <td>77</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>GBP_USD</strong></td>
+                    <td class="negative">-78.12%</td>
+                    <td>8.56%</td>
+                    <td class="negative">-89.12%</td>
+                    <td>32.47%</td>
+                    <td>0.75</td>
+                    <td>71</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>AUD_USD</strong></td>
+                    <td class="negative">-72.34%</td>
+                    <td>15.23%</td>
+                    <td class="negative">-85.34%</td>
+                    <td>38.96%</td>
+                    <td>0.91</td>
+                    <td>82</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>USD_JPY</strong></td>
+                    <td class="negative">-68.91%</td>
+                    <td>-5.67%</td>
+                    <td class="negative">-82.45%</td>
+                    <td>41.56%</td>
+                    <td>1.02</td>
+                    <td>68</td>
+                </tr>
+        
+                <tr>
+                    <td><strong>USD_CAD</strong></td>
+                    <td class="negative">-71.56%</td>
+                    <td>3.45%</td>
+                    <td class="negative">-84.67%</td>
+                    <td>39.34%</td>
+                    <td>0.95</td>
+                    <td>75</td>
+                </tr>
+        
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Visualizations</h2>
+            <div class="chart">
+                <h3>Comprehensive Comparison</h3>
+                <img src="backtest_comparison.png" alt="Backtest Comparison">
+            </div>
+            <div class="chart">
+                <h3>Asset Class Summary</h3>
+                <img src="asset_class_summary.png" alt="Asset Class Summary">
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 Key Findings</h2>
+            <ul>
+                <li><strong>Strategy Performance:</strong> The Ichimoku strategy shows negative returns on both stocks and forex, indicating the strategy parameters may need optimization for the current market conditions.</li>
+                <li><strong>Win Rate:</strong> Stocks show higher win rates (30-55%) compared to forex (32-42%), but with lower trade frequency.</li>
+                <li><strong>Risk Management:</strong> The EMA trend filter reduces exposure time while managing drawdown, but cannot prevent losses in sustained downtrends.</li>
+                <li><strong>Profit Factor:</strong> Most instruments show profit factors < 1.0, indicating more losing trades than winning trades.</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>💡 Recommendations</h2>
+            <ul>
+                <li>Optimize Ichimoku parameters (Tenkan, Kijun, Senkou B periods)</li>
+                <li>Test different EMA lengths for trend filtering</li>
+                <li>Implement better risk management (position sizing, stop loss optimization)</li>
+                <li>Consider combining with other technical indicators for confirmation</li>
+                <li>Backtest on different timeframes (4H, 1H) for higher frequency trading</li>
+                <li>Test on additional asset classes or pairs for comparison</li>
+            </ul>
+        </div>
+        
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid #ddd; color: #999;">
+            <p>Generated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+            <p>Strategy: Ichimoku Cloud + EMA Trend Filter | Period: 5 years daily data</p>
+        </footer>
+    </body>
+    </html>
+    
