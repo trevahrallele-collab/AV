@@ -2,3 +2,8 @@ requests
 pandas
 sqlalchemy
 plotly
+pandas_ta
+backtesting
+yfinance
+
+Flask

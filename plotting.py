@@ -180,3 +180,61 @@ def save_candlestick_html(df: pd.DataFrame, filename: str, title: str = "Candles
     
     fig.write_html(filename)
     print(f"✅ Chart saved to {filename}")
+
+
+def plot_equity_curve(equity_series, title: str = "Equity Curve", filename: str = None, show: bool = True):
+    """
+    Plot an equity curve (P/L over time) and optionally save to an HTML file.
+
+    Args:
+        equity_series: Pandas Series or array-like of equity values (index should be datetime)
+        title: Chart title
+        filename: If provided, write the interactive chart to this HTML file
+        show: If True, render the figure immediately
+    Returns:
+        plotly Figure
+    """
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    if not isinstance(equity_series, pd.Series):
+        try:
+            equity_series = pd.Series(equity_series)
+        except Exception:
+            raise ValueError("equity_series must be a pandas Series or array-like")
+
+    # Ensure datetime index if possible
+    if not isinstance(equity_series.index, pd.DatetimeIndex):
+        try:
+            equity_series.index = pd.to_datetime(equity_series.index)
+        except Exception:
+            pass
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=equity_series.index,
+        y=equity_series.values,
+        mode='lines',
+        name='Equity',
+        line=dict(color='green', width=2)
+    ))
+
+    # Draw zero (starting) line if useful
+    fig.add_hline(y=equity_series.iloc[0] if len(equity_series) else 0, line=dict(color='gray', dash='dash'), annotation_text='Start')
+
+    fig.update_layout(
+        title=title,
+        xaxis_title='Time',
+        yaxis_title='Equity ($)',
+        template='plotly_white',
+        hovermode='x unified',
+    )
+
+    if filename:
+        fig.write_html(filename)
+        print(f"✅ Equity chart saved to {filename}")
+
+    if show:
+        fig.show()
+
+    return fig
